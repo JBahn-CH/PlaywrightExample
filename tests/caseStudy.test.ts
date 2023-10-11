@@ -66,9 +66,6 @@ test('task1_3_UI', async ({ page }) => {
     await login(page);
     await searchArt(page, 'Maker Rembrandt van Rijn');
     await page.locator("xpath=//h2[contains(text(),'Works of art')]//following-sibling::a").click();
-    // await page.locator("xpath=//figure[@data-item-index=0]").hover();
-    // await page.locator("xpath=//figure[@data-item-index=0]//following-sibling::a[@data-button='button-icon button-fav-no']").click();
-    const count = 0;
     for(let i = 0; i <= 2; ++i) {
       await page.locator("xpath=//figure[@data-item-index="+i+"]").hover();
       await page.locator("xpath=//figure[@data-item-index="+i+"]//following-sibling::a[@data-button='button-icon button-fav-no']").click();
