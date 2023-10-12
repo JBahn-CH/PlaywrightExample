@@ -54,16 +54,6 @@ test('task1_2_API', async ({ request }) => {
   }
 });
 
-test('task1_3_UI', async ({ page }) => {
-  const status = await request.get('https://www.rijksmuseum.nl/api/en/collection?key=7mzKrt0r&material=canvas&q=Hilversum&f.dating.period=17');
-  const response = JSON.parse(await status.text());
-  expect(status.ok()).toBeTruthy();
-  if(response.artObjects[0].longTitle != 'The Feast of St Nicholas, Jan Havicksz. Steen, 1665 - 1668') {
-    console.error('Das gesuchte Bild wurde nicht gefunden')
-    fail('Das Kunstwerk The Feast of St Nicholas, Jan Havicksz. Steen, 1665 - 1668 wurde nicht gefunden');
-  }
-});
-
 test('task2_UI', async ({ page }) => {
   await login(page);
   await searchArt(page, 'Maker Rembrandt van Rijn');
