@@ -103,3 +103,13 @@ test('task3_addTicketToShoppingCart', async ({ page }) => {
   await page.locator(xpaths.continue_Button_TicketShop).click();
   await page.locator(xpaths.title_Payment_Methods).isVisible();
 });
+
+test('task3_uploadProfilePicture', async ({ page }) => {
+  await login(page);
+  await page.goto('https://www.rijksmuseum.nl/en/rijksstudio/my/profile');
+  await closePopUp(page);
+  await page.setInputFiles("//input[contains(@accept,'image/jpeg')]", './img/xebia-logo-2.png');
+  await page.locator("xpath=//a[@id='upload-file-button']").click();
+  await page.waitForSelector("xpath=//div[@class='jcrop-tracker']");
+  await page.locator("//label[text()='Choose your cutout']/parent::fieldset/following-sibling::fieldset//button[contains(text(),'Save')]").click();
+});

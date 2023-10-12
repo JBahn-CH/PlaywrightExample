@@ -45,6 +45,10 @@ export const closePopUp = async (page:Page) => {
     await page.locator("xpath=//h2[contains(text(),'Share your collection My first collection')]/../following::button[contains(text(),'Close')][1]").click();
     await addToCollectionIf(page);
   }
+  const welcomeToRijksstudio = await page.locator("xpath=//h2[contains(text(),'Welcome to Rijksstudio')]");
+  if(welcomeToRijksstudio && await welcomeToRijksstudio.isVisible()) {
+    await page.locator("xpath=//h2[contains(text(),'Welcome to Rijksstudio')]/../following::button[contains(text(),'Close')][1]").click();
+  }
 }
 
 const addToCollectionIf = async (page:Page) => {
