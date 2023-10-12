@@ -1,5 +1,7 @@
 import { Page } from '@playwright/test';
 
+const xpaths = require('./xpaths');
+
 export const searchArt = async (page:Page, searchObject) => {
     await page.getByLabel('Search').click();
     await page.waitForLoadState();
@@ -8,17 +10,26 @@ export const searchArt = async (page:Page, searchObject) => {
 }
 
 export const login = async (page:Page) => {
-    await page.goto('https://www.rijksmuseum.nl/en');
-    const noThanksButton = await page.locator('text=No, rather not');
-    if (noThanksButton) {
-      await noThanksButton.click();
+    await page.goto(process.env.URL_MUSEUM_HOME!);
+    await cookie(page);
+    await page.locator(xpaths.login_home_header).click();
+    await page.waitForSelector(xpaths.login_submit_button);
+    await page.locator(xpaths.login_email_input).fill(process.env.LOGIN_MAIL!);
+    await page.locator(xpaths.login_password_input).fill(process.env.LOGIN_PASSWORD!);
+    await page.locator(xpaths.login_submit_button).click();
+    await page.waitForURL(process.env.URL_MUSEUM_HOME!);
+}
+
+export const cookie = async (page:Page) => {
+  const cookieUsageStart = await page.locator('text=No, rather not');
+    if (cookieUsageStart && await cookieUsageStart.isVisible()) {
+      await cookieUsageStart.click();
     }
-    await page.locator("//ul[@class='header-links header-options']//a//span[contains(text(), 'Login')]").click();
-    await page.waitForSelector("xpath=//button[@type='submit']");
-    await page.locator("xpath=//input[@id='email']").fill(process.env.LOGIN_MAIL!);
-    await page.locator("xpath=//input[@id='wachtwoord']").fill(process.env.LOGIN_PASSWORD!);
-    await page.locator("xpath=//button[@type='submit']").click();
-    await page.waitForURL('https://www.rijksmuseum.nl/en');
+    await page.waitForTimeout(500);
+  const cookieUsageGiftshop = await page.locator("xpath=//p[@class='title' and contains(text(), 'COOKIE USAGE')]");
+    if(cookieUsageGiftshop && await cookieUsageGiftshop.isVisible()) {
+      await page.locator("xpath=//a[contains(@class,'cookie-permission--accept-button')]").click();
+    }
 }
 
 export const closePopUp = async (page:Page) => {
