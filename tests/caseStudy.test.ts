@@ -1,6 +1,10 @@
 import { test, expect, request, } from '@playwright/test';
 import { fail } from 'assert';
-import { login, searchArt, closePopUp, cookie } from './functions';
+import { login } from './login';
+import { cookie } from './home';
+import { deleteArtSet } from './myprofile';
+import { fillFormAdvanceSearch, searchArt, searchResultsLikeArt } from './search';
+import { addToCollectionIf, closePopUp, createNewSet, needToLoginToSaveThisWork } from './popups';
 const xpaths = require('./xpaths');
 const { DateTime } = require('luxon');
 
@@ -9,6 +13,8 @@ type searchResults = {
 }
 
 test('task1_1_UI', async ({ page }) => {
+  await page.goto(process.env.URL_MUSEUM_HOME!);
+  await cookie(page);
   await searchArt(page, 'Maker Rembrandt van Rijn');
   const searchResult = await page.locator(xpaths.search_results).textContent();
   const match = searchResult.match(/\((\d+)\s+results\)/);
@@ -30,17 +36,12 @@ test('task1_1_API', async ({ request }) => {
 });
 
 test('task1_2_UI', async ({ page }) => {
+  await page.goto(process.env.URL_MUSEUM_HOME!);
+  await cookie(page);
   await searchArt(page, 'Hilversum')
   await page.locator(xpaths.search_results_view_all).click();
   await page.getByText('Advanced search').click();
-  await page.getByPlaceholder('Start year').fill('1600');
-  await page.getByPlaceholder('End year').fill('1700');
-  await page.locator(xpaths.advanced_search_material).click();
-  await page.keyboard.type('canvas');
-  await page.waitForTimeout(1000);
-  await page.keyboard.press('Enter');
-  await page.locator(xpaths.advanced_search_searchbar).focus();
-  await page.keyboard.press('Enter');
+  await fillFormAdvanceSearch(page, '1600', '1700', 'canvas');
   await page.getByText('The Feast of St Nicholas').click();
 });
 
@@ -55,17 +56,54 @@ test('task1_2_API', async ({ request }) => {
 });
 
 test('task2_UI', async ({ page }) => {
-  await login(page);
+  const newSetName = 'Xebia';
+  await page.goto(process.env.URL_MUSEUM_HOME!);
+  await page.waitForLoadState('domcontentloaded');
+  await cookie(page);
   await searchArt(page, 'Maker Rembrandt van Rijn');
   await page.locator(xpaths.search_results_view_all).click();
-  for(let i = 0; i <= 2; ++i) {
-    await page.locator("xpath=//figure[@data-item-index="+i+"]").hover();
-    await page.locator("xpath=//figure[@data-item-index="+i+"]//following-sibling::a[@data-button='button-icon button-fav-no']").click();
+  let k = true;
+  for(let i = 0; i <= 2; ++i) { //Dieser For Loop soll sicherstellen, dass 3 Kunstobjekte einer deiner Sammlungen hinzugefügt wird.
+    await page.waitForLoadState('domcontentloaded');
+    if(k === false) {
+      await searchResultsLikeArt(page, i);
+    }
+    while (k) { //Diese While Schlaufe wurde eingebaut, da der Klick auf den "Like" Knopf für das erste Kunstobjekt manchmal nicht reagiert. In so einem fall soll dies sollange probiert werden, bis es funktioniert 
+      await searchResultsLikeArt(page, i); 
+      // Warten auf das Erscheinen des h1-Elements
+      await page.waitForSelector(xpaths.Rijksstudio_account_login_title, { timeout: 1000 }).catch(err => {
+        // Dieser Block wird ausgeführt, wenn das Element nach 1 Sekunden nicht gefunden wurde
+        true;
+      });
+      // Überprüfen, ob das h1-Element sichtbar ist
+      const h1Element = await page.locator(xpaths.Rijksstudio_account_login_title);
+      const isH1Visible = await h1Element.isVisible();
+      if (isH1Visible) {
+        // Das h1-Element ist sichtbar, die Schleife beenden
+        k = false;
+        break;
+      }
+    }
+    if(i === 0){
+      await needToLoginToSaveThisWork(page);
+      await createNewSet(page, newSetName)
+    }
     await closePopUp(page);    
+    await addToCollectionIf(page, newSetName);
   }
-  await page.goto('https://www.rijksmuseum.nl/en/rijksstudio/4463427--joel-hirano/collections?ii=0');
+  await page.reload();
+  await page.waitForLoadState('domcontentloaded');
+  const profilAvatar = await page.locator("xpath=//li[@class='user-profile']");
+  if (!(await profilAvatar.isVisible())) {
+    await profilAvatar.click();
+  }
   const works = await page.locator("//p[@class='text-subtle']//span[contains(text(),'3 works')]");
   if(works) {
+    await page.waitForLoadState('domcontentloaded');
+    await page.reload();
+    // await page.locator("xpath=//button[text()='Get started']").click();
+    await page.locator("xpath=//a[contains(@href,'collections/"+newSetName.toLowerCase()+"') and (text()='"+newSetName+"')]").click();
+    await deleteArtSet(page);
     await console.log('Test sucessfull');
   } else {
     fail('The test has failed');
@@ -105,11 +143,11 @@ test('task3_addTicketToShoppingCart', async ({ page }) => {
 });
 
 test('task3_uploadProfilePicture', async ({ page }) => {
-  await login(page);
-  await page.goto('https://www.rijksmuseum.nl/en/rijksstudio/my/profile');
+  await login(page, 'Home');
+  await page.goto(process.env.URL_MUSEUM_MYPROFILE!);
   await closePopUp(page);
-  await page.setInputFiles("//input[contains(@accept,'image/jpeg')]", './img/xebia-logo-2.png');
-  await page.locator("xpath=//a[@id='upload-file-button']").click();
+  await page.setInputFiles(xpaths.profile_settings_profile_pic_input, process.env.IMG_PATH!+'xebia-logo-2.png');
+  await page.locator(xpaths.profile_settings_upload_profile).click();
   await page.waitForSelector("xpath=//div[@class='jcrop-tracker']");
-  await page.locator("//label[text()='Choose your cutout']/parent::fieldset/following-sibling::fieldset//button[contains(text(),'Save')]").click();
+  await page.locator(xpaths.profile_settings_profile_pic_save).click();
 });
