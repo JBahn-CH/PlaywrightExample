@@ -26,7 +26,6 @@ export const validateProfilePicUpload = async (page:Page, profilePicNameExpected
   const profilePicNameElement = await page.$("xpath=//span[@data-role='upload-input']");
   const profilePicName = await profilePicNameElement?.textContent();
   const matches = profilePicName?.match(/\b([\w.-]+\.png)\b/g);
-  // const match = matches[0];
   if(matches[0] !== profilePicNameExpected) {
     fail('Das Profilbild wurde nicht geändert');
   }

@@ -44,5 +44,4 @@ module.exports = {
     open_product_mizuno_wave_rider_27:  "xpath=//div[@class='product--actions']/../a[@title='Wave Rider 27' and contains(text(),'Wave Rider 27')]",
     add_product_to_shopping_cart:       "xpath=//button[@name='Add to shopping cart']",
     view_shopping_cart:                 "xpath=//a[@title='View shopping cart']",
-
   };
