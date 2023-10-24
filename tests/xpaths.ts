@@ -6,17 +6,17 @@ module.exports = {
     login_email_input:                  "xpath=//input[@id='email']",
     login_password_input:               "xpath=//input[@id='wachtwoord']",
 
-    //search results
+    //Search results
     search_results_view_all:            "xpath=//h2[contains(text(),'Works of art')]//following-sibling::a",
 
-    //advanced search
+    //Advanced search
     advanced_search_material:           "xpath=//input[@id='token-input-QueryDescriptor_AdvancedSearchOptions_ObjectCriteria_Material']",
     advanced_search_searchbar:          "xpath=//input[@id='advanced-search-field']",
 
     //'task1_1_UI'
     search_results:                     "xpath=//p[@class='search-results-count']",
 
-    //profile settings
+    //Profile settings
     profile_settings_profile_pic_input: "xpath=//input[contains(@accept,'image/jpeg')]",
     profile_settings_upload_profile:    "xpath=//a[@id='upload-file-button']",
     profile_settings_profile_pic_save:  "xpath=//label[text()='Choose your cutout']/parent::fieldset/following-sibling::fieldset//button[contains(text(),'Save')]",
@@ -25,8 +25,7 @@ module.exports = {
     Rijksstudio_account_login_title:    "xpath=//h1[contains(text(),'you need a Rijksstudio')]",
     Rijksstudio_account_login_already_have_account:    "xpath=//button[contains(text(),'I already have a Rijksstudio')]",
 
-    
-    //'task3_addTicketToShoppingCart'
+    //Ticketshop
     select_ticketshop_button:           "xpath=//a[contains(text(),'Rijksmuseum tickets')]",
     add_adult_ticket_button:            "xpath=//button[@aria-label='Add one Entrance adult ticket']",
     select_ticket_tour_option:          "xpath=//span[contains(text(),'Museum entrance')]",
@@ -39,7 +38,7 @@ module.exports = {
     checkBox_Terms_Conditions:          "xpath=//label[@data-uitest='acceptterms']",
     title_Payment_Methods:              "xpath=//h2[text()='Payment method']",
     
-    //'task3_addProductToShoppingCart'
+    //Giftshop
     open_giftshop_home:                 "xpath=//li[@class='header-link']/a/span[contains(text(),'Giftshop')]",
     select_mizuno_category_giftshop:    "xpath=//a[contains(@title, 'mizuno')]",
     open_product_mizuno_wave_rider_27:  "xpath=//div[@class='product--actions']/../a[@title='Wave Rider 27' and contains(text(),'Wave Rider 27')]",
