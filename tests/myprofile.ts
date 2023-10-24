@@ -1,5 +1,6 @@
 import { Page } from '@playwright/test';
 import { closePopUp } from './popups';
+import { fail } from 'assert';
 const xpaths = require('./xpaths');
 
 
@@ -19,4 +20,14 @@ export const uploadNewProfilePic = async (page:Page, profilePicName) => {
   await page.locator(xpaths.profile_settings_upload_profile).click();
   await page.waitForSelector("xpath=//div[@class='jcrop-tracker']");
   await page.locator(xpaths.profile_settings_profile_pic_save).click();
+}
+
+export const validateProfilePicUpload = async (page:Page, profilePicNameExpected) => {
+  const profilePicNameElement = await page.$("xpath=//span[@data-role='upload-input']");
+  const profilePicName = await profilePicNameElement?.textContent();
+  const matches = profilePicName?.match(/\b([\w.-]+\.png)\b/g);
+  // const match = matches[0];
+  if(matches[0] !== profilePicNameExpected) {
+    fail('Das Profilbild wurde nicht geändert');
+  }
 }

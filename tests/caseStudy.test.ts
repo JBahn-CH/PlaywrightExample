@@ -2,7 +2,7 @@ import { test, expect, request, } from '@playwright/test';
 import { fail } from 'assert';
 import { login } from './login';
 import { cookie } from './home';
-import { deleteArtSet, uploadNewProfilePic } from './myprofile';
+import { deleteArtSet, uploadNewProfilePic, validateProfilePicUpload } from './myprofile';
 import { fillFormAdvanceSearch, searchArt, searchResultsLikeArt } from './search';
 import { addToCollectionIf, closePopUp, createNewSet, needToLoginToSaveThisWork } from './popups';
 import { addXAdultTicket, fillInPersonalDetail, selectNextAvailableTime } from './shop';
@@ -18,7 +18,7 @@ test('task1_1_UI', async ({ page }) => {
   await cookie(page);
   await searchArt(page, 'Maker Rembrandt van Rijn');
   const searchResult = await page.locator(xpaths.search_results).textContent();
-  const match = searchResult.match(/\((\d+)\s+results\)/);
+  const match = searchResult?.match(/\((\d+)\s+results\)/);
   const anzahl = parseInt(match[1]);
   if(anzahl < 10){
     console.error('Die Suche hat weniger als 10 Resultate ergeben.')
@@ -139,6 +139,11 @@ test('task3_addTicketToShoppingCart', async ({ page }) => {
 });
 
 test('task3_uploadProfilePicture', async ({ page }) => {
+  const profilePicName = 'xebia-logo-2.png';
+  const profilePicNameDefault = 'sheldon.png'
   await login(page, 'Home');
-  await uploadNewProfilePic(page, 'xebia-logo-2.png');
+  await uploadNewProfilePic(page, profilePicName);
+  await validateProfilePicUpload(page, profilePicName);
+  await uploadNewProfilePic(page, profilePicNameDefault);
+  await validateProfilePicUpload(page, profilePicNameDefault);
 });
