@@ -2,9 +2,10 @@ import { test, expect, request, } from '@playwright/test';
 import { fail } from 'assert';
 import { login } from './login';
 import { cookie } from './home';
-import { deleteArtSet } from './myprofile';
+import { deleteArtSet, uploadNewProfilePic } from './myprofile';
 import { fillFormAdvanceSearch, searchArt, searchResultsLikeArt } from './search';
 import { addToCollectionIf, closePopUp, createNewSet, needToLoginToSaveThisWork } from './popups';
+import { addXAdultTicket, fillInPersonalDetail, selectNextAvailableTime } from './shop';
 const xpaths = require('./xpaths');
 const { DateTime } = require('luxon');
 
@@ -126,28 +127,18 @@ test('task3_addTicketToShoppingCart', async ({ page }) => {
   await page.goto(process.env.URL_MUSEUM_HOME!);
   await cookie(page);
   await page.locator(xpaths.select_ticketshop_button).click();
-  await page.locator(xpaths.add_adult_ticket_button).click();
-  await page.locator(xpaths.continue_Button_TicketShop).click();
+  await addXAdultTicket(page, 1);
   await page.locator(xpaths.select_ticket_tour_option).click();
   const currentDate = await DateTime.now().toLocaleString({ weekday: 'long', month: 'long', day: '2-digit', year: 'numeric' });
   await page.locator("xpath=//button[@aria-label='"+currentDate+"']").click();
-  await page.locator(xpaths.select_last_timeslot_tour).click();
+  await selectNextAvailableTime(page);
   await page.locator(xpaths.continue_Button_TicketShop).click();
-  await page.locator(xpaths.input_FirstName_TicketForm).fill('Guenter');
-  await page.locator(xpaths.input_LastName_TicketForm).fill('Jauch');
-  await page.locator(xpaths.input_Email_TicketForm).fill('guenter.jauch@yopmail.com');
-  await page.locator(xpaths.input_Email_Conf_TicketForm).fill('guenter.jauch@yopmail.com');
-  await page.locator(xpaths.checkBox_Terms_Conditions).click();
+  await fillInPersonalDetail(page);
   await page.locator(xpaths.continue_Button_TicketShop).click();
   await page.locator(xpaths.title_Payment_Methods).isVisible();
 });
 
 test('task3_uploadProfilePicture', async ({ page }) => {
   await login(page, 'Home');
-  await page.goto(process.env.URL_MUSEUM_MYPROFILE!);
-  await closePopUp(page);
-  await page.setInputFiles(xpaths.profile_settings_profile_pic_input, process.env.IMG_PATH!+'xebia-logo-2.png');
-  await page.locator(xpaths.profile_settings_upload_profile).click();
-  await page.waitForSelector("xpath=//div[@class='jcrop-tracker']");
-  await page.locator(xpaths.profile_settings_profile_pic_save).click();
+  await uploadNewProfilePic(page, 'xebia-logo-2.png');
 });

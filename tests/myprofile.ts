@@ -1,4 +1,5 @@
 import { Page } from '@playwright/test';
+import { closePopUp } from './popups';
 const xpaths = require('./xpaths');
 
 
@@ -10,3 +11,12 @@ export const deleteArtSet = async (page:Page) => {
     await page.locator("//button[@data-role='set-delete']").click();
     await page.getByRole('button', { name: 'Yes, delete' }).click();
   }
+
+export const uploadNewProfilePic = async (page:Page, profilePicName) => {
+  await page.goto(process.env.URL_MUSEUM_MYPROFILE!);
+  await closePopUp(page);
+  await page.setInputFiles(xpaths.profile_settings_profile_pic_input, process.env.IMG_PATH!+profilePicName);
+  await page.locator(xpaths.profile_settings_upload_profile).click();
+  await page.waitForSelector("xpath=//div[@class='jcrop-tracker']");
+  await page.locator(xpaths.profile_settings_profile_pic_save).click();
+}

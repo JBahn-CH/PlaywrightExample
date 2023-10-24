@@ -1,9 +1,11 @@
 import { Page } from '@playwright/test';
+import { cookie } from './home';
 const xpaths = require('./xpaths');
 
 export const login = async (page:Page, whereAmI) => {
     if(whereAmI === 'Home'){
       await page.goto(process.env.URL_MUSEUM_HOME!);
+      await cookie(page);
       await page.waitForLoadState('domcontentloaded');
       await page.locator(xpaths.login_home_header).click();
       await page.waitForSelector(xpaths.login_submit_button);
