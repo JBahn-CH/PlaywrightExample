@@ -3,7 +3,6 @@ import { cookie } from './home';
 const xpaths = require('./xpaths');
 
 export const login = async (page:Page, whereAmI: string) => {
-    if(whereAmI === 'Home'){
       await page.goto(process.env.URL_MUSEUM_HOME!);
       await cookie(page);
       await page.waitForLoadState('domcontentloaded');
@@ -11,7 +10,6 @@ export const login = async (page:Page, whereAmI: string) => {
       await fillInLogin(page);
       await page.getByRole('button', { name: 'Log in'}).click();
       await page.waitForURL(process.env.URL_MUSEUM_HOME!);
-    } 
   }
 
 const fillInLogin = async (page:Page) => {
